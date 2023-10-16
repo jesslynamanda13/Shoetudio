@@ -7,6 +7,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import controller.ShoeController;
+import controller.UserController;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import model.User;
@@ -16,9 +18,12 @@ public class DatabaseConnection {
 	public Statement statement;
 	public ResultSet resultSet;
 	public ResultSetMetaData resultSetMetaData;
-	public PreparedStatement preparedStatement; 
+	public PreparedStatement preparedStatement;
+	private UserController controller;
 
+	
 	public DatabaseConnection() {
+		
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 				connection = DriverManager
@@ -31,8 +36,12 @@ public class DatabaseConnection {
 		}
 	}
 	
-	// migrate database
 	public void migrateDatabase() {
+		createUsersTable();
+		createShoesTable();
+	}
+	
+	public void createUsersTable() {
 		String createTableQuery = "CREATE TABLE IF NOT EXISTS users ("
                 + "id INT AUTO_INCREMENT PRIMARY KEY,"
 				+ "name VARCHAR(255) NOT NULL,"
@@ -42,68 +51,57 @@ public class DatabaseConnection {
                 + "isAdmin BOOLEAN NOT NULL"
                 + ")";
         try {
-        	exec(createTableQuery);
+        	exec(createTableQuery); 
+        	
 		} catch (Exception e) {
-			System.out.println("User table created successfully.");
-		}
-        
-        
-        
-	}
-	
-	// create default admin
-	public void createAdmin() {
-		String insertQuery = "INSERT INTO users (name, username,email, password, isAdmin) VALUES (?, ?, ?,?, ?)";
-        try {
-			preparedStatement = connection.prepareStatement(insertQuery);
-			preparedStatement.setString(1, "Admin");
-	        preparedStatement.setString(2, "admin13");
-	        preparedStatement.setString(3, "admin@gmail.com"); 
-	        preparedStatement.setString(4, "adminpassword"); 
-	        preparedStatement.setBoolean(5, true);
-	        preparedStatement.execute();
-		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public boolean loginAuth(String email, String password){
-		String query = "SELECT * FROM users WHERE email = ?";
-		String error = "";
-		
-		try {
-			PreparedStatement preparedStatement = connection.prepareStatement(query);
-	        preparedStatement.setString(1, email);
-	        ResultSet resultSet = preparedStatement.executeQuery();
-	        
-	        if (resultSet.next()) {
-               
-                String storedPassword = resultSet.getString("password");
-
-                if (password.equals(storedPassword)) {
-                    System.out.println("Authentication successful.");
-                    return true;
-                } else {
-                	error = error + "- Authentication failed: Incorrect password.\n";
-                    System.out.println("Authentication failed: Incorrect password.");
-                }
-            } else {
-            	error = error + "- Authentication failed: User not found.\n";
-                System.out.println("Authentication failed: User not found.");
-            }
-		} catch (SQLException e) {
-			// TODO: handle exception
-		}
-		
-		if(error != "") {
-			error = "Found some error(s):\n" + error;
-			Alert alert = new Alert(AlertType.WARNING);
-			alert.setContentText(error);
-			alert.show();
-		}
-        
-		return false;
+	public void createShoesTable() {
+	    String createTableQuery = "CREATE TABLE IF NOT EXISTS shoes ("
+	            + "id INT AUTO_INCREMENT PRIMARY KEY,"
+	            + "model VARCHAR(255) NOT NULL,"
+	            + "brand VARCHAR(255) NOT NULL,"
+	            + "color VARCHAR(255) NOT NULL,"
+	            + "price DOUBLE NOT NULL"
+	            + ")";
+	    try {
+	        exec(createTableQuery);
+	       
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
 	}
+	
+	// create default admin
+//	public void createAdmin() {
+//		String selectQuery = "SELECT COUNT(*) FROM users WHERE username = ?";
+//
+//	    try {
+//	        PreparedStatement checkStatement = connection.prepareStatement(selectQuery);
+//	        checkStatement.setString(1, "admin13");
+//	        ResultSet resultSet = checkStatement.executeQuery();
+//
+//	        if (resultSet.next() && resultSet.getInt(1) == 0) {
+//	            String insertQuery = "INSERT INTO users (name, username, email, password, isAdmin) VALUES (?, ?, ?, ?, ?)";
+//	            PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
+//	            preparedStatement.setString(1, "Admin");
+//	            preparedStatement.setString(2, "admin13");
+//	            preparedStatement.setString(3, "admin@gmail.com");
+//	            preparedStatement.setString(4, "adminpassword");
+//	            preparedStatement.setBoolean(5, true);
+//	            preparedStatement.execute();
+//	            preparedStatement.close();
+//	        }
+//	        resultSet.close();
+//	        checkStatement.close();
+//	    } catch (SQLException e) {
+//	        e.printStackTrace();
+//	    }
+//        
+//	}
+	
 	
 	public ResultSet execQuery(String query) {
 		try {

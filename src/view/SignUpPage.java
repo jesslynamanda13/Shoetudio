@@ -1,6 +1,7 @@
 
 package view;
 
+import controller.UserController;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
@@ -37,14 +38,18 @@ public class SignUpPage implements EventHandler<ActionEvent> {
 	private Rectangle square;
 	private Pane squareElements;
 	
-	private Label hello, loginMessage, signUpMessage, emailLabel, passwordLabel;
-	private TextField emailTF;
+	private Label  loginMessage, nameLabel, usernameLabel, emailLabel, passwordLabel;
+	private TextField nameTF, usernameTF, emailTF;
 	private PasswordField passwordTF;
 	private Button submitBtn;
 	
 	private Image image;
 	private ImageView imageView;
 	private LoginPage loginPage;
+	
+	private Button signUpMessage;
+	UserController controller = new UserController();
+	
 	
 	private void init() {
 		screen = new BorderPane();
@@ -62,22 +67,33 @@ public class SignUpPage implements EventHandler<ActionEvent> {
 	    String fontUrl = "https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Tsukimi+Rounded&display=swap";
 	    screen.getStylesheets().add(fontUrl);
 
-	    
-	    hello = new Label("Create Account");
-	    hello.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 24px;");
-	    
 	    loginMessage = new Label("Sign Up to shoestudio");
 	    loginMessage.setStyle("-fx-font-family: 'Tsukimi Rounded'; -fx-font-size: 16px; -fx-text-fill: #4E3434");
 	    
-	    signUpMessage = new Label("Already have an account? Login.");
-	    signUpMessage.setStyle("-fx-font-family: 'Tsukimi Rounded'; -fx-font-size: 12px; -fx-text-fill: blue; -fx-underline: true;");
-	    signUpMessage.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                Scene loginScene = loginPage.getScene();
-                stage.setScene(loginScene);
-            }
-        });
+	    signUpMessage = new Button("Already have an account? Login.");
+	    signUpMessage.setStyle("-fx-font-family: 'Tsukimi Rounded'; -fx-font-size: 12px; -fx-text-fill: blue; -fx-background-color: transparent; -fx-border-color: transparent;");
+	    signUpMessage.setOnAction(this);
+	    signUpMessage.setUnderline(true);
+//	    signUpMessage.setOnMouseClicked(new EventHandler<MouseEvent>() {
+//            @Override
+//            public void handle(MouseEvent event) {
+//                Scene loginScene = loginPage.getScene();
+//                stage.setScene(loginScene);
+//            }
+//        });
+	    
+	    nameLabel = new Label("name:");
+	    nameTF = new TextField("Jane Doe");
+	    nameLabel.setStyle("-fx-font-family: 'Tsukimi Rounded'; -fx-font-size: 16px; -fx-text-fill: #4E3434");
+	    nameTF.setStyle("-fx-border-color: pink;\r\n"
+	    		+ "    -fx-border-width: 2px;");
+	    
+	    usernameLabel = new Label("username:");
+	    usernameTF = new TextField("jane13");
+	    usernameLabel.setStyle("-fx-font-family: 'Tsukimi Rounded'; -fx-font-size: 16px; -fx-text-fill: #4E3434");
+	    usernameTF.setStyle("-fx-border-color: pink;\r\n"
+	    		+ "    -fx-border-width: 2px;");
+	    
 	    emailLabel = new Label("email:");
 	    emailTF = new TextField("hello@gmail.com");
 	    emailLabel.setStyle("-fx-font-family: 'Tsukimi Rounded'; -fx-font-size: 16px; -fx-text-fill: #4E3434");
@@ -102,37 +118,39 @@ public class SignUpPage implements EventHandler<ActionEvent> {
 	}
 	
 	private void setLayout() {
-		messagePane.add(imageView, 0, 0);
-		messagePane.add(hello, 0, 1);
+//		messagePane.add(imageView, 0, 0);
+//		messagePane.add(hello, 0, 1);
 		messagePane.add(loginMessage, 0, 2);
 		messagePane.add(signUpMessage, 0, 3);
-		messagePane.add(emailLabel, 0, 4);
-		messagePane.add(emailTF, 0, 5);
-		messagePane.add(passwordLabel, 0, 6);
-		messagePane.add(passwordTF, 0, 7);
-		messagePane.add(submitBtn, 0, 8);
+		messagePane.add(nameLabel, 0, 4);
+		messagePane.add(nameTF, 0, 5);
+		messagePane.add(usernameLabel, 0, 6);
+		messagePane.add(usernameTF, 0, 7);
+		messagePane.add(emailLabel, 0, 8);
+		messagePane.add(emailTF, 0, 9);
+		messagePane.add(passwordLabel, 0, 10);
+		messagePane.add(passwordTF, 0, 11);
+		messagePane.add(submitBtn, 0, 12);
 		messagePane.setAlignment(Pos.CENTER);
 		messagePane.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY)));
 
-	    
-		GridPane.setMargin(hello, new Insets(20, 0, 0, 0));
-	    GridPane.setMargin(loginMessage, new Insets(15, 0, 0, 0));
 	    GridPane.setMargin(signUpMessage, new Insets(5, 0, 0, 0));
-//	    GridPane.setMargin(imageView, new Insets(0, 0, 0, ));
 	    
+	    GridPane.setMargin(nameLabel, new Insets(15,0,0,0));
+	    GridPane.setMargin(nameTF, new Insets(10,0,0,0));
+	    GridPane.setMargin(usernameLabel, new Insets(15,0,0,0));
+	    GridPane.setMargin(usernameTF, new Insets(10,0,0,0));
 	    GridPane.setMargin(emailLabel, new Insets(15,0,0,0));
 	    GridPane.setMargin(emailTF, new Insets(10,0,0,0));
 	    GridPane.setMargin(passwordLabel, new Insets(15,0,0,0));
 	    GridPane.setMargin(passwordTF, new Insets(10,0,0,0));
 	    GridPane.setMargin(submitBtn, new Insets(20,0,0,0));
 	    
-	    GridPane.setHalignment(imageView, HPos.CENTER);
-	    GridPane.setHalignment(hello, HPos.CENTER);
+//	    GridPane.setHalignment(imageView, HPos.CENTER);
+//	    GridPane.setHalignment(hello, HPos.CENTER);
 	    GridPane.setHalignment(loginMessage, HPos.CENTER);
 	    GridPane.setHalignment(signUpMessage, HPos.CENTER);
-	    GridPane.setHalignment(emailLabel, HPos.CENTER);
 	    GridPane.setHalignment(emailTF, HPos.CENTER);
-	    GridPane.setHalignment(passwordLabel, HPos.CENTER);
 	    GridPane.setHalignment(passwordTF, HPos.CENTER);
 	    GridPane.setHalignment(submitBtn, HPos.CENTER);
 
@@ -147,7 +165,7 @@ public class SignUpPage implements EventHandler<ActionEvent> {
 		init();
 		setLayout();
 		this.stage = stage;
-		this.loginPage = new LoginPage(stage);
+//		this.loginPage = new LoginPage(stage);
 		this.stage.setTitle("Sign up!");
 		this.scene = new Scene(screen, 600,600);
 		submitBtn.setOnAction(this);
@@ -159,9 +177,26 @@ public class SignUpPage implements EventHandler<ActionEvent> {
 	}
 
 	@Override
-	public void handle(ActionEvent arg0) {
+	public void handle(ActionEvent clicked) {
 		// TODO Auto-generated method stub
+		if (clicked.getSource() == signUpMessage) {
+			changeToLogin();
+		}else if(clicked.getSource() == submitBtn) {
+			boolean res = false;
+			res = controller.validateRegisterInput(nameTF.getText(),
+					usernameTF.getText(), emailTF.getText(), passwordTF.getText());
+			if (res) {
+				changeToLogin();
+			}
+		}
 		
+	}
+	
+	public void changeToLogin() {
+		LoginPage loginPage= new LoginPage(stage);
+		Scene loginScene = loginPage.getScene();
+		stage.setScene(loginScene);
+		stage.show();
 	}
 
 	

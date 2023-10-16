@@ -25,6 +25,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import controller.UserController;
 import index.DatabaseConnection;
 
 public class LoginPage implements EventHandler<ActionEvent> {
@@ -37,7 +38,7 @@ public class LoginPage implements EventHandler<ActionEvent> {
 	private Rectangle square;
 	private Pane squareElements;
 	
-	private Label hello, loginMessage, signUpMessage, emailLabel, passwordLabel;
+	private Label hello, loginMessage, emailLabel, passwordLabel;
 	private TextField emailTF;
 	private PasswordField passwordTF;
 	private Button submitBtn;
@@ -45,8 +46,15 @@ public class LoginPage implements EventHandler<ActionEvent> {
 	private Image image;
 	private ImageView imageView;
 	private DatabaseConnection databaseConnection;
-	private SignUpPage signUpPage;
 	
+	private SignUpPage signUpPage;
+	private Home home;
+	private AdminDashboard admin;
+	
+	private Button signUpMessage;
+	UserController controller = new UserController();
+
+
 	private void init() {
 		screen = new BorderPane();
 		centerBox = new StackPane();
@@ -71,19 +79,20 @@ public class LoginPage implements EventHandler<ActionEvent> {
 	    loginMessage = new Label("Login to shoespace");
 	    loginMessage.setStyle("-fx-font-family: 'Tsukimi Rounded'; -fx-font-size: 16px; -fx-text-fill: #4E3434");
 	    
-	    signUpMessage = new Label("New? Sign-up here.");
-	    signUpMessage.setStyle("-fx-font-family: 'Tsukimi Rounded'; -fx-font-size: 12px; -fx-text-fill: blue; -fx-underline: true;");
-	    
-	    signUpMessage.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                Scene signUpScene = signUpPage.getScene();
-                stage.setScene(signUpScene);
-            }
-        });
+	    signUpMessage = new Button("New? Sign-up here.");
+	    signUpMessage.setStyle("-fx-font-family: 'Tsukimi Rounded'; -fx-font-size: 12px; -fx-text-fill: blue; -fx-background-color: transparent; -fx-border-color: transparent;");
+	    signUpMessage.setOnAction(this);
+	    signUpMessage.setUnderline(true);
+//	    signUpMessage.setOnMouseClicked(new EventHandler<MouseEvent>() {
+//            @Override
+//            public void handle(MouseEvent event) {
+//                Scene signUpScene = signUpPage.getScene();
+//                stage.setScene(signUpScene);
+//            }
+//        });
 	    
 	    emailLabel = new Label("email:");
-	    emailTF = new TextField("hello@gmail.com");
+	    emailTF = new TextField("admin@gmail.com");
 	    emailLabel.setStyle("-fx-font-family: 'Tsukimi Rounded'; -fx-font-size: 16px; -fx-text-fill: #4E3434");
 	    
 	    emailTF.setStyle("-fx-border-color: pink;\r\n"
@@ -98,6 +107,7 @@ public class LoginPage implements EventHandler<ActionEvent> {
 	    submitBtn.setStyle("-fx-background-color: pink; -fx-border-color: white; "
 	    		+ "-fx-font-family: 'Tsukimi Rounded'; -fx-font-size: 14px; -fx-text-fill: #4E3434;");
 
+	    submitBtn.setOnAction(this);
 	    image = new Image("file:///C:/Users/Jesslyn%20Amanda/Shoetudio/assets/login/letter.png");
 	    imageView = new ImageView(image);
 	    imageView.setFitWidth(100);
@@ -151,35 +161,12 @@ public class LoginPage implements EventHandler<ActionEvent> {
 		init();
 		setLayout();
 		this.stage = stage;
-		this.signUpPage = new SignUpPage(stage);
+		this.home = new Home(stage);
 		this.stage.setTitle("Welcome!");
 		this.scene = new Scene(screen, 600,600);
 		submitBtn.setOnAction(this);
 	}
 	
-	private boolean validateLoginInput() {
-		databaseConnection = new DatabaseConnection();
-		boolean result = true;
-		String error = "";
-		if(emailTF.getText() == "") {
-			error = error + "- Email must not be null!\n";
-		}
-		
-		if(passwordTF.getText() == "") {
-			error = error + "- Password must not be null!\n";
-		}
-		if(error != "") {
-			result = false;
-			error = "Found some error(s):\n" + error;
-			Alert alert = new Alert(AlertType.WARNING);
-			alert.setContentText(error);
-			alert.show();
-		}else {
-			result = databaseConnection.loginAuth(emailTF.getText(), passwordTF.getText());
-		}
-		
-		return result;
-	}
 	
 	public Scene getScene() {
 		return this.scene;
@@ -187,7 +174,27 @@ public class LoginPage implements EventHandler<ActionEvent> {
 
 	@Override
 	public void handle(ActionEvent clicked) {
-		validateLoginInput();
+		if (clicked.getSource() == signUpMessage) {
+			SignUpPage signUpPage2 = new SignUpPage(stage);
+			Scene signUpScene = signUpPage2.getScene();
+			stage.setScene(signUpScene);
+			
+		}else if(clicked.getSource() == submitBtn) {
+			boolean res = false;
+			boolean adminRole = false;
+			res = controller.validateLoginInput(emailTF.getText(), passwordTF.getText());
+			adminRole = controller.ifUserAdmin(emailTF.getText());
+			if (res && adminRole) {
+				AdminDashboard admin = new AdminDashboard(stage);
+				Scene adminScene = admin.getScene();
+	            stage.setScene(adminScene);
+			}else if (res) {
+				Home home = new Home(stage);
+				Scene homeScene = home.getScene();
+	            stage.setScene(homeScene);
+			}
+		}
+		stage.show();
 	}
 		
 }
